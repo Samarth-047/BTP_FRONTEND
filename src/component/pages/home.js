@@ -47,7 +47,7 @@ function Home() {
     }
 
     async function PushChunks(chunk, i, filename) {
-        axios.post('http://localhost:3001/user/addText', {
+        axios.post('https://datacollection-qrgp.onrender.com/user/addText', {
             chunks: chunk,
             filename: filename,
             index: i

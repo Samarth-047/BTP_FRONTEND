@@ -63,7 +63,7 @@ function Home() {
     };
 
     React.useEffect(() => {
-        fetch("http://localhost:3001/user/getText")
+        fetch("https://datacollection-qrgp.onrender.com/user/getText")
             .then((res) => res.json())
             .then((data) => {
                 console.log(data);
