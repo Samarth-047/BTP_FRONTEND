@@ -4,81 +4,93 @@ import { useState } from 'react';
 import "./back.css";
 import "./home.css";
 import { useNavigate } from "react-router-dom";
-
-
-
-
+import { useEffect } from 'react';
+// import { useHistory } from "react-router-dom";
 
 function FIleupload() {
+    // const history = useHistory();
     const [selectedFile, setSelectedFile] = useState();
     const [isSelected, setIsFilePicked] = useState(false);
     const [choose_upload, setupload] = useState("0");
-    const [isLoading, setIsLoading] = useState(false);
-    const [chunk, setchunk] = useState("");
+    const [chunk, setchunk] = useState("");   
+    const [selectedChunks, setSelectedChunks] = useState([]);
+    // const [showDialog, setShowDialog] = useState(false);
     var _validFileExtensions = [".pdf", ".txt"];
 
 
     const navigate = useNavigate();
 
-    function createChunks(chunkSize, text) {
+    function createChunks(chunkSize,text) {
         const chunks = [];
 
         const words = text.split('\n');
 
-        for (let i = 0; i < words.length; i++) {
+        for (let i = 0; i < words.length; i ++) {
             chunks.push(words[i]);
         }
-
-
-
-        // for (let i = 0; i < text.length; i += chunkSize) {
-        //     chunks.push(text.substring(i, i + chunkSize));
-        // }
+        
         return chunks;
     };
 
     function handleFileLoad(event) {
         const content = event.target.result;
         const contentString = String.fromCharCode.apply(null, new Uint8Array(content));
-
+        
         const chunks = createChunks(70, contentString);
-        console.log(chunks)
+        // console.log(chunks);
         setchunk(chunks);
+        console.log("Updated Chunks:", chunks);
+        // console.log("Chunks are 2",chunks);
+
     }
 
-    async function PushChunks(chunk, i, filename) {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // setShowDialog(true);
+        console.log("Chunks are 1",chunk);
+        navigate("/chunks", {state:{ chunks: chunk, submitFunction: SubmitFile }});
+        setSelectedFile(null);
+        setIsFilePicked(false);
+        setupload("0");
+        setSelectedChunks([]);
+    };
+
+    async function PushChunks(chunk,i,filename){
         axios.post('http://localhost:3001/user/addText', {
             chunks: chunk,
             filename: filename,
             index: i
         })
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
-    async function AlertHandler(k, l) {
-        navigate("/main");
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        }); 
     }
 
-    async function submitRecordingData() {
-        let k = 0;
-        for (let i = 0; i < chunk.length; i++) {
-            let v = chunk[i];
+    async function submitRecordingData(){
+        let k=0;
+        for(let i=0;i<selectedChunks.length;i++){
+            let v =selectedChunks[i];
             // remove .txt from filename
             let filename = selectedFile.name;
             filename = filename.replace('.txt', '');
-            await PushChunks(v, i, filename);
+            await PushChunks(v,i,filename);
         }
         return k;
     };
 
-    async function SubmitFile() {
+    async function AlertHandler(k,l){
+        
+        navigate("/main");
+        
+    }
+
+    async function SubmitFile () {
         // loop throgh chunks and send to server
         let k = await submitRecordingData();
-        await AlertHandler(k, chunk.length);
+        await AlertHandler(k,chunk.length);
     };
 
     const ValidateSingleInput = (oInput) => {
@@ -101,29 +113,14 @@ function FIleupload() {
                 }
                 setSelectedFile(oInput.files[0]);
                 setIsFilePicked(true);
-                const file = oInput.files[0];
+                // setShowDialog(true);
+                const file= oInput.files[0];
                 const reader = new FileReader();
                 reader.onload = handleFileLoad;
                 reader.readAsArrayBuffer(file);
             }
         }
         return true;
-    };
-    const handleNavigation = async () => {
-        try {
-          setIsLoading(true);
-      
-          // Simulate the delay with setTimeout
-          await new Promise((resolve) => setTimeout(resolve, 60000));
-      
-          // Perform your navigation or other function logic here
-          // Example: history.push('/new-page');
-        } catch (error) {
-            alert("Couldn't upload file");
-        } finally {
-          setIsLoading(false);
-          navigate("/main");
-        }
     };
 
     return (
@@ -138,11 +135,9 @@ function FIleupload() {
             }
             {choose_upload === "1" &&
                 <div >
-                    <div className='home_card'>
+                    <div className='home_card' >
                         <br />
-
-                        {/* <input type="file" name="file" onChange={changeHandler} /> */}
-                        <input type="file" name="file" onChange={ValidateSingleInput} />
+                        <input type="file"  name="file" onChange={ValidateSingleInput} />
 
                         {isSelected ? (
                             //display error msg if the file uploaded is not .txt/.pdf
@@ -151,8 +146,8 @@ function FIleupload() {
                             <div>
                                 <br />
                                 <p> Filename: {selectedFile.name}</p>
-                                <p><t></t>Filetype: {selectedFile.type}</p>
-                                <p><t></t>Size in bytes: {selectedFile.size}</p>
+                                <p> Filetype: {selectedFile.type}</p>
+                                <p> Size in bytes: {selectedFile.size}</p>
                                 <p>
                                     last Modified Date:{' '}
                                     {selectedFile.lastModifiedDate.toLocaleDateString()}
@@ -163,14 +158,8 @@ function FIleupload() {
                             <p>Select a file to show details</p>
                         )}
                         <div>
-                            <button className='button-style' onClick={SubmitFile}>Submit</button>
-                        </div>
-                        {isLoading ? (
-                            <div>Loading...</div>
-                        ) : (
-                            <button className='button-style' onClick={handleNavigation}>Submit</button>
-                        )}
-
+                            <button className='button-style' onClick={handleSubmit}>Submit</button>
+                        </div> 
                         <br />
                     </div>
 
