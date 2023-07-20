@@ -23,7 +23,7 @@ function FIleupload() {
     function createChunks(chunkSize, text) {
         const chunks = [];
 
-        const words = text.split('\n');
+        const words = text.split('\r\n');
 
         for (let i = 0; i < words.length; i++) {
             chunks.push(words[i]);
