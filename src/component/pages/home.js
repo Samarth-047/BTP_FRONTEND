@@ -17,6 +17,35 @@ function Home() {
     const [chunk, setchunk] = useState("");
     var _validFileExtensions = [".pdf", ".txt"];
 
+    const [text, setText] = useState();
+
+    let fileReader;
+
+    const onChange = e => {
+        let file = e.target.files;
+        fileReader = new FileReader();
+        fileReader.onloadend = handleFileRead;
+        fileReader.readAsText(file[0]);
+        console.log(text);
+    };
+
+    const cleanContent = string => {
+        string = string.replace(/^\s*[\r\n]/gm, "");
+        let array = string.split(new RegExp(/[\r\n]/gm));
+        console.log(array);
+        array.splice(0, 3);
+        array.splice(-3);
+        return array.join("\n");
+    };
+
+    const handleFileRead = e => {
+        let content = fileReader.result;
+        // let text = deleteLines(content, 3);
+        content = cleanContent(content);
+        // … do something with the 'content' …
+        setText(content);
+    };
+
 
     const navigate = useNavigate();
 
@@ -110,15 +139,16 @@ function Home() {
         return true;
     };
     return (
-        <div style={{display:'flex',flexDirection:'row',background:'white'}}>
+        <div style={{ display: 'flex', flexDirection: 'row', background: 'white' }}>
             <Sidebar />
-            <div style={{display:'flex',flexDirection:'column',background:' rgb(239, 236, 236)',justifyContent:'center',alignItems:'center',width:'100%', }}>
+            <div style={{ display: 'flex', flexDirection: 'column', background: ' rgb(239, 236, 236)', justifyContent: 'center', alignItems: 'center', width: '100%', }}>
                 <div >
                     <div className='home_card'>
                         <br />
 
                         {/* <input type="file" name="file" onChange={changeHandler} /> */}
-                        <input type="file" name="file" onChange={ValidateSingleInput} />
+                        {/* <input type="file" name="file" onChange={ValidateSingleInput} /> */}
+                        <input type="file" name="myfile" onChange={onChange} />
 
                         {isSelected ? (
                             //display error msg if the file uploaded is not .txt/.pdf
