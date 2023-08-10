@@ -125,7 +125,7 @@ function Home() {
         </div>
     );
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', background: 'white' }}>
+        <div style={{ display: 'flex', flexDirgitection: 'row', background: 'white' }}>
             <Sidebar />
             <div style={{ display: 'flex', flexDirection: 'column', background: ' rgb(239, 236, 236)', justifyContent: 'center', alignItems: 'center', width: '100%', }}>
                 {recording === false &&
