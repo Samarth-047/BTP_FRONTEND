@@ -62,3 +62,10 @@
     background-color: rgb(33, 206, 117);
     transform: scale(1.05);
 }
+
+.xyz{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

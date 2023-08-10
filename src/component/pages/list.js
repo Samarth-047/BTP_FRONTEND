@@ -116,16 +116,37 @@ function Home() {
             );
     }
     // create async submitRecording function
+    const downloadAudio = () => {
+        const textUrl = URL.createObjectURL(new Blob([text_to_be_read.text], { type: "text/plain" }));
+        const textLink = document.createElement("a");
+        textLink.href = textUrl;
+        textLink.download = `${text_to_be_read.filename}.txt`;
+        document.body.appendChild(textLink);
+        textLink.click();
+        document.body.removeChild(textLink);
+
+        const link = document.createElement("a");
+        link.href = Audio;
+        link.download = `${text_to_be_read.filename}.wav`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
 
 
     const footerContent = (
-        <div>
-            <Button label="No" icon="pi pi-times" onClick={() => setVisible(false)} className="p-button-text" />
-            <Button label="Yes" icon="pi pi-check" onClick={submitRecording} autoFocus />
+        <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center"}}>
+            <button onClick={downloadAudio} disabled={Audio === null}> Download Recorded Audio </button>
+            <br/>
+            <div styles={{marginLeft:"100vw"}}>
+                <Button label="No" icon="pi pi-times" onClick={() => setVisible(false)} autoFocus />
+                <Button label="Yes" icon="pi pi-check" onClick={submitRecording} autoFocus />
+            </div>
         </div>
     );
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', background: 'white' }}>
+        <div style={{ display: 'flex', flexDirgitection: 'row', background: 'white' }}>
             <Sidebar />
             <div style={{ display: 'flex', flexDirection: 'column', background: ' rgb(239, 236, 236)', justifyContent: 'center', alignItems: 'center', width: '100%', }}>
                 {recording === false &&
