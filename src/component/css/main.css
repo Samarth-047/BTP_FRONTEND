@@ -1,12 +1,12 @@
 .main_card{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     background-color: white;
     max-width: 60vw;
     min-width: 70vw;
-    max-height: 60vh;
+    height:auto;
     padding-left: 2vw;
     padding-right: 2vw;
     border-radius: 10px;
@@ -19,7 +19,7 @@
 
 .text_box{
     height: 20vh;
-    width: 65vw;
+    width: 100%;
     padding-top: 1vh;
     padding-left: 1vw;
     padding-right: 1vw;
