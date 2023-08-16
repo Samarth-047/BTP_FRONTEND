@@ -5,7 +5,6 @@ import "../css/back.css"
 import "../css/main.css"
 import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
-import axios from 'axios';
 
 
 
@@ -48,48 +47,13 @@ function Home() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Chunks are 1",chunk);
-        navigate("/chunks", {state:{ chunks: chunk}});
+        // console.log("Chunks are 1",chunk);
+        navigate("/chunks", {state:{ chunks: chunk , fileName: selectedFile.name }});
         setSelectedFile(null);
         setIsFilePicked(false);
         setSelectedChunks([]);
     };
 
-    async function PushChunks(chunk, i, filename) {
-        axios.post('https://datacollection-qrgp.onrender.com/user/addText', {
-            chunks: chunk,
-            filename: filename,
-            index: i
-        })
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
-
-    async function submitRecordingData() {
-        let k = 0;
-        for (let i = 0; i < selectedChunks.length; i++) {
-            let v = selectedChunks[i];
-            // remove .txt from filename
-            let filename = selectedFile.name;
-            filename = filename.replace('.txt', '');
-            await PushChunks(v, i, filename);
-        }
-        return k;
-    };
-
-    async function AlertHandler(k, l) {
-        navigate("/list");
-    }
-
-    async function SubmitFile() {
-        // loop throgh chunks and send to server
-        let k = await submitRecordingData();
-        await AlertHandler(k, chunk.length);
-    };
     const ValidateSingleInput = (oInput) => {
         let Input_file = oInput;
         oInput = oInput.target;

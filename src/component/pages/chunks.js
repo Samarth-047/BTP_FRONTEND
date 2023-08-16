@@ -1,12 +1,53 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
+import axios from 'axios';
+
 
 function ChunksPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const chunks = location.state?.chunks || [];
+  const fileName = location.state?.fileName || null;
   const [selectedChunks, setSelectedChunks] = useState([]);
+
+  console.log( location );
+
+  async function PushChunks(chunk, i, filename) {
+    await axios.post('https://datacollection-qrgp.onrender.com/user/addText', {
+        chunks: chunk,
+        filename: filename,
+        index: i
+    })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+async function submitRecordingData() {
+    let k = 0;
+    for (let i = 0; i < selectedChunks.length; i++) {
+        let v = selectedChunks[i];
+        // remove .txt from filename
+        let filename = fileName;
+        filename = filename.replace('.txt', '');
+        await PushChunks(v, i, filename);
+    }
+    return k;
+};
+
+async function AlertHandler(k, l) {
+    navigate("/list");
+}
+
+async function SubmitFile() {
+    // loop throgh chunks and send to server
+    let k = await submitRecordingData();
+    await AlertHandler(k, selectedChunks.length);
+};
 
   const handleCheckboxChange = (event, index) => {
     if (event.target.checked) {
@@ -25,7 +66,8 @@ function ChunksPage() {
   };
 
   const handleConfirm = () => {
-    navigate("/");
+    SubmitFile();
+    // navigate("/");
   };
 
   const handleCancel = () => {

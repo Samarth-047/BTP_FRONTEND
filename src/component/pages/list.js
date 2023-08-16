@@ -127,14 +127,14 @@ function Home() {
         const textUrl = URL.createObjectURL(new Blob([text_to_be_read.text], { type: "text/plain" }));
         const textLink = document.createElement("a");
         textLink.href = textUrl;
-        textLink.download = `${text_to_be_read.filename}.txt`;
+        textLink.download = `${text_to_be_read.filename}_${text_to_be_read.index}.txt`;
         document.body.appendChild(textLink);
         textLink.click();
         document.body.removeChild(textLink);
 
         const link = document.createElement("a");
         link.href = Audio;
-        link.download = `${text_to_be_read.filename}.wav`;
+        link.download = `${text_to_be_read.filename}_${text_to_be_read.index}.wav`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
