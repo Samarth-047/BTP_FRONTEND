@@ -16,8 +16,31 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 
+// function convertMP3ToWAV(mp3URL, targetSampleRate) {
+//     return new Promise((resolve, reject) => {
+//         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+//         const xhr = new XMLHttpRequest();
+//         xhr.open('GET', mp3URL, true);
+//         xhr.responseType = 'arraybuffer';
+//         // console.log("Sampling frequency is ", audioContext.sampleRate);
+//         xhr.onload = () => {
+//             audioContext.decodeAudioData(xhr.response, (buffer) => {
+//                 const wavBuffer = audioContext.createBuffer(
+//                     1, buffer.length, targetSampleRate
+//                 );
+//                 wavBuffer.copyToChannel(buffer.getChannelData(0), 0);
+//                 const wavData = wavBuffer.getChannelData(0);
+//                 const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+//                 const wavURL = URL.createObjectURL(wavBlob);
+//                 resolve(wavURL);
+//             });
+//         };
+//         xhr.onerror = (e) => reject(e);
+//         xhr.send();
+//     });
+// }
 
-function convertMP3ToWAV(mp3URL) {
+function convertMP3ToWAV(mp3URL, targetSampleRate) {
     return new Promise((resolve, reject) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const xhr = new XMLHttpRequest();
@@ -25,13 +48,28 @@ function convertMP3ToWAV(mp3URL) {
         xhr.responseType = 'arraybuffer';
         xhr.onload = () => {
             audioContext.decodeAudioData(xhr.response, (buffer) => {
-                const wavBuffer = audioContext.createBuffer(
-                    1, buffer.length, audioContext.sampleRate
+                // Convert the audio data to PCM format
+                const pcmData = buffer.getChannelData(0);
+                
+                // Create a new buffer with the PCM data
+                const pcmBuffer = audioContext.createBuffer(
+                    1, pcmData.length, targetSampleRate
                 );
-                wavBuffer.copyToChannel(buffer.getChannelData(0), 0);
+                pcmBuffer.copyToChannel(pcmData, 0);
+                
+                // Create a WAV buffer from the PCM buffer
+                const wavBuffer = audioContext.createBuffer(
+                    1, pcmBuffer.length, targetSampleRate
+                );
+                wavBuffer.copyToChannel(pcmBuffer.getChannelData(0), 0);
+                
+                // Create a Blob and URL for the WAV data
                 const wavData = wavBuffer.getChannelData(0);
-                const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+                const wavBlob = new Blob([new DataView(wavData.buffer)], {
+                    type: 'audio/wav',
+                });
                 const wavURL = URL.createObjectURL(wavBlob);
+                
                 resolve(wavURL);
             });
         };
@@ -39,6 +77,8 @@ function convertMP3ToWAV(mp3URL) {
         xhr.send();
     });
 }
+
+
 
 function Home() {
     const [Audio, setAudio] = useState(null);
@@ -96,7 +136,7 @@ function Home() {
 
 
     async function handleConvertToWAV() {
-        const url = await convertMP3ToWAV(Audio);
+        const url = await convertMP3ToWAV(Audio, 16000);
         setAudio(url);
     }
 
@@ -115,6 +155,7 @@ function Home() {
             gender:gender,
             phoneNumber:phoneNumber
         })
+        
             .then(function (response) {
                 alert("Audio Uploaded successfully");
                 window.location.reload("/main");

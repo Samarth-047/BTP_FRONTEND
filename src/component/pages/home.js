@@ -94,11 +94,12 @@ function Home() {
                         {isSelected ? (
                             //display error msg if the file uploaded is not .txt/.pdf
                             // if (selectedFile.type)
+                        
+                                <div>
 
-                            <div>
-                                <br />
-                                <p> Filename: {selectedFile.name}</p>
-                                <p>Filetype: {selectedFile.type}</p>
+                                    <br />
+                                    <p> Filename: {selectedFile.name}</p>
+                                    <p>Filetype: {selectedFile.type}</p>
                                 <p>Size in bytes: {selectedFile.size}</p>
                                 <p>
                                     last Modified Date:{' '}
