@@ -96,7 +96,6 @@ function Home() {
                             // if (selectedFile.type)
                         
                                 <div>
-
                                     <br />
                                     <p> Filename: {selectedFile.name}</p>
                                     <p>Filetype: {selectedFile.type}</p>

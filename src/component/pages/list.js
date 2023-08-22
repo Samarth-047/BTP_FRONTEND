@@ -16,60 +16,22 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 
-// function convertMP3ToWAV(mp3URL, targetSampleRate) {
-//     return new Promise((resolve, reject) => {
-//         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-//         const xhr = new XMLHttpRequest();
-//         xhr.open('GET', mp3URL, true);
-//         xhr.responseType = 'arraybuffer';
-//         // console.log("Sampling frequency is ", audioContext.sampleRate);
-//         xhr.onload = () => {
-//             audioContext.decodeAudioData(xhr.response, (buffer) => {
-//                 const wavBuffer = audioContext.createBuffer(
-//                     1, buffer.length, targetSampleRate
-//                 );
-//                 wavBuffer.copyToChannel(buffer.getChannelData(0), 0);
-//                 const wavData = wavBuffer.getChannelData(0);
-//                 const wavBlob = new Blob([wavData], { type: 'audio/wav' });
-//                 const wavURL = URL.createObjectURL(wavBlob);
-//                 resolve(wavURL);
-//             });
-//         };
-//         xhr.onerror = (e) => reject(e);
-//         xhr.send();
-//     });
-// }
-
-function convertMP3ToWAV(mp3URL, targetSampleRate) {
+function convertMP3ToWAV(mp3URL) {
     return new Promise((resolve, reject) => {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const xhr = new XMLHttpRequest();
         xhr.open('GET', mp3URL, true);
         xhr.responseType = 'arraybuffer';
+        // console.log("Sampling frequency is ", audioContext.sampleRate);
         xhr.onload = () => {
             audioContext.decodeAudioData(xhr.response, (buffer) => {
-                // Convert the audio data to PCM format
-                const pcmData = buffer.getChannelData(0);
-                
-                // Create a new buffer with the PCM data
-                const pcmBuffer = audioContext.createBuffer(
-                    1, pcmData.length, targetSampleRate
-                );
-                pcmBuffer.copyToChannel(pcmData, 0);
-                
-                // Create a WAV buffer from the PCM buffer
                 const wavBuffer = audioContext.createBuffer(
-                    1, pcmBuffer.length, targetSampleRate
+                    1, buffer.length, audioContext.sampleRate
                 );
-                wavBuffer.copyToChannel(pcmBuffer.getChannelData(0), 0);
-                
-                // Create a Blob and URL for the WAV data
+                wavBuffer.copyToChannel(buffer.getChannelData(0), 0);
                 const wavData = wavBuffer.getChannelData(0);
-                const wavBlob = new Blob([new DataView(wavData.buffer)], {
-                    type: 'audio/wav',
-                });
+                const wavBlob = new Blob([wavData], { type: 'audio/wav' });
                 const wavURL = URL.createObjectURL(wavBlob);
-                
                 resolve(wavURL);
             });
         };
@@ -78,7 +40,43 @@ function convertMP3ToWAV(mp3URL, targetSampleRate) {
     });
 }
 
-
+// function convertMP3ToWAV(mp3URL, targetSampleRate) {
+//     return new Promise((resolve, reject) => {
+//         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+//         const xhr = new XMLHttpRequest();
+//         xhr.open('GET', mp3URL, true);
+//         xhr.responseType = 'arraybuffer';
+//         xhr.onload = () => {
+//             audioContext.decodeAudioData(xhr.response, (buffer) => {
+//                 // Convert the audio data to PCM format
+//                 const pcmData = buffer.getChannelData(0);
+                
+//                 // Create a new buffer with the PCM data
+//                 const pcmBuffer = audioContext.createBuffer(
+//                     1, pcmData.length, targetSampleRate
+//                 );
+//                 pcmBuffer.copyToChannel(pcmData, 0);
+                
+//                 // Create a WAV buffer from the PCM buffer
+//                 const wavBuffer = audioContext.createBuffer(
+//                     1, pcmBuffer.length, targetSampleRate
+//                 );
+//                 wavBuffer.copyToChannel(pcmBuffer.getChannelData(0), 0);
+                
+//                 // Create a Blob and URL for the WAV data
+//                 const wavData = wavBuffer.getChannelData(0);
+//                 const wavBlob = new Blob([new DataView(wavData.buffer)], {
+//                     type: 'audio/wav',
+//                 });
+//                 const wavURL = URL.createObjectURL(wavBlob);
+                
+//                 resolve(wavURL);
+//             });
+//         };
+//         xhr.onerror = (e) => reject(e);
+//         xhr.send();
+//     });
+// }
 
 function Home() {
     const [Audio, setAudio] = useState(null);
@@ -109,15 +107,16 @@ function Home() {
     };
 
     React.useEffect(() => {
-        fetch("https://datacollection-qrgp.onrender.com/user/getText")
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                settext_to_be_read(data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        axios.get('http://localhost:3001/user/getText')
+            .then(function (response) {
+                settext_to_be_read(response.data);
+                console.log(text_to_be_read);
+            }
+            )
+            .catch(function (error) {
+                console.log(error);
+            }
+            );
     }, []);
 
     const refreshPage = () => {
@@ -168,14 +167,14 @@ function Home() {
         const textUrl = URL.createObjectURL(new Blob([text_to_be_read.text], { type: "text/plain" }));
         const textLink = document.createElement("a");
         textLink.href = textUrl;
-        textLink.download = `${text_to_be_read.filename}_${text_to_be_read.index}.txt`;
+        textLink.download = `${text_to_be_read.id}.txt`;
         document.body.appendChild(textLink);
         textLink.click();
         document.body.removeChild(textLink);
 
         const link = document.createElement("a");
         link.href = Audio;
-        link.download = `${text_to_be_read.filename}_${text_to_be_read.index}.wav`;
+        link.download = `${text_to_be_read.id}.wav`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
