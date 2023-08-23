@@ -18,9 +18,10 @@
 }
 
 .text_box{
-    height: 20vh;
+    height: auto;
     width: 100%;
-    padding-top: 1vh;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
     padding-left: 1vw;
     padding-right: 1vw;
     background-color: rgb(238, 241, 243);

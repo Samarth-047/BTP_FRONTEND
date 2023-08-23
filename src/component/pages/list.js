@@ -89,7 +89,7 @@ function Home() {
     const [nativeLanguage, setNativeLanguage] = React.useState(localStorage.getItem("nativeLanguage") || '');
     const [gender, setGender] = React.useState(localStorage.getItem("gender") || '');
     const [phoneNumber, setPhoneNumber] = React.useState(localStorage.getItem("phoneNumber") || '');
-    const [metaData, setMetaData] = useState();
+    // const [metaData, setMetaData] = useState();
     const {
         startRecording,
         stopRecording,
@@ -121,18 +121,22 @@ function Home() {
     }, []);
 
     async function getData() {
+        var temp;
          await axios.get('http://localhost:3001/user/getAllMetaData')
          .then(function (response) {
-             setMetaData(response.data);
+            //  setMetaData(response.data);
+             temp=response.data;
+            //  console.log("Data is : ", response.data);
          } )
          .catch( function (error) {
              console.log(error);
          });
+         return temp;
     }
 
     async function downloadMetaData(){
-        await getData();
-        console.log(metaData);
+        var metaData=await getData();
+        console.log("Data1 is : ", metaData);
         // Create a Blob containing the JSON data
         const jsonData = JSON.stringify(metaData, null, 2);
         const blob = new Blob([jsonData], { type: 'application/json' });
@@ -140,7 +144,7 @@ function Home() {
         // Create a download link
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = 'metadata.json';
+        link.download = 'Metadata.json';
 
         // Trigger a click event to initiate the download
         link.click();
