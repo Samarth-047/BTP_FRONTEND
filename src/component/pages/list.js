@@ -89,6 +89,7 @@ function Home() {
     const [nativeLanguage, setNativeLanguage] = React.useState(localStorage.getItem("nativeLanguage") || '');
     const [gender, setGender] = React.useState(localStorage.getItem("gender") || '');
     const [phoneNumber, setPhoneNumber] = React.useState(localStorage.getItem("phoneNumber") || '');
+    const [metaData, setMetaData] = useState();
     const {
         startRecording,
         stopRecording,
@@ -118,6 +119,32 @@ function Home() {
             }
             );
     }, []);
+
+    async function getData() {
+         await axios.get('http://localhost:3001/user/getAllMetaData')
+         .then(function (response) {
+             setMetaData(response.data);
+         } )
+         .catch( function (error) {
+             console.log(error);
+         });
+    }
+
+    async function downloadMetaData(){
+        await getData();
+        console.log(metaData);
+        // Create a Blob containing the JSON data
+        const jsonData = JSON.stringify(metaData, null, 2);
+        const blob = new Blob([jsonData], { type: 'application/json' });
+
+        // Create a download link
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'metadata.json';
+
+        // Trigger a click event to initiate the download
+        link.click();
+    }
 
     const refreshPage = () => {
         window.location.reload("/main");
@@ -251,6 +278,8 @@ function Home() {
                         <br/>
                     </div>
                     <div style={{ flex: "50%" }}>
+                        <Button label="MetaData" icon="pi pi-external-link" onClick={() => downloadMetaData()} />
+
                         <div className='text_box'>{text_to_be_read.text}</div>
                         <br />
                         <div className='button-style' style={{ display: "flex", flesDirection: "column", justifyContent: "center", alignContent: "center" }} onClick={ButtonHide}><AudioRecorder
